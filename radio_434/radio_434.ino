@@ -1,7 +1,4 @@
 
-#define SWITCHON  "10"
-#define SWITCHOFF "01"
-
 #define SENDER_DATA_PIN A0
 
 // 10101     00101100  11
@@ -11,37 +8,58 @@ String queue = "test";
 
 void setup() {
   pinMode(SENDER_DATA_PIN, OUTPUT);
-
+  queue.reserve(500);
   Serial.begin(9600);
+  
+  while (!Serial) {
+    ; 
+  }
 }
 
 void loop() {
-  if (queue.length > 0) {
-    sendCode(queue);
+  serialEvent();
+  if (queue.length() > 0) {
+    for (int i=0; i<queue.length(); i++) {
+      sendMessage(queue[i]);
+    }
     queue = "";
   }
 }
 
 void serialEvent() {
-  Serial.println();
+  while (Serial.available()) {
+    char inChar = (char) Serial.read();
+    queue += inChar;
+  }
 }
 
-boolean sendCode(String code){
-  for(short z = 0; z<7; z++){ // repeat the code 7x
-    for(short i = 0; i<12; i++){ // codelength 12 bits
-      sendByte(code[i]);
+void sendMessage(char payload) {
+  sendBit('p'); // preamble
+  sendPayload(payload);
+  sendBit('x'); // sync
+}
+
+void sendPayload(char payload) {
+  Serial.println(payload, BIN);
+  for (int j=0; j<8; j++) { 
+    if (payload & (1 << j)) {
+      sendBit('1');
+    } else {
+      sendBit('0');
     }
-  sendByte('x'); // send sync code
   }
 }
  
-void sendByte(char i) {
+void sendBit(char i) {
+  Serial.println(i);
+  return;
+  
   switch(i){
   case '0':{
     digitalWrite(SENDER_DATA_PIN,HIGH);
     wait(1); 
     digitalWrite(SENDER_DATA_PIN,LOW);
-    wait(3);
+    wait(1);
     digitalWrite(SENDER_DATA_PIN,HIGH);
     wait(3);
     digitalWrite(SENDER_DATA_PIN,LOW);
