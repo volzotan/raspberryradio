@@ -6,11 +6,10 @@ FILENAME = "testdata_44kHz.dat"
 fd = open(FILENAME)
 
 # get filesize
-# one float = 4 Byte
+# one signed 16bit integer = 2 Byte
 statinfo = os.stat(FILENAME)
-n = statinfo.st_size/4
+n = statinfo.st_size/2
 
-floats = struct.unpack('f'*n, fd.read(4*n))
+values = struct.unpack('h'*n, fd.read(2*n))
+print(max(values))
 
-print(max(floats))
-print(n/44100)
