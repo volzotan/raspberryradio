@@ -33,56 +33,75 @@ void serialEvent() {
   }
 }
 
-void sendMessage(char payload) {
-  sendBit('p'); // preamble
-  sendPayload(payload);
-  sendBit('x'); // sync
-}
-
-void sendPayload(char payload) {
+void convert(char binaryrep[], char payload) {
   Serial.println(payload, BIN);
+  
+  int paritybit = 0;
+  
   for (int j=0; j<8; j++) { 
     if (payload & (1 << j)) {
-      sendBit('1');
+      binaryrep[j] = '1';
+      paritybit++;
     } else {
-      sendBit('0');
+      binaryrep[j] = '0';
     }
   }
+  
+  binaryrep[8] = (paritybit % 2) + 48; // 1 -> '1'
+}
+
+void sendMessage(char payload) {
+  char binaryrep[9] = {0};
+  convert(binaryrep, payload);
+
+  sendBit('p'); // preamble
+  
+  for (int i=0; i<sizeof(binaryrep); i++) {
+    sendBit(binaryrep[i]);
+  }
+   
+  sendBit('x'); // sync
 }
  
 void sendBit(char i) {
   Serial.println(i);
-  return;
+  //return;
   
   switch(i){
-  case '0':{
-    digitalWrite(SENDER_DATA_PIN,HIGH);
-    wait(1); 
-    digitalWrite(SENDER_DATA_PIN,LOW);
-    wait(1);
-    digitalWrite(SENDER_DATA_PIN,HIGH);
-    wait(3);
-    digitalWrite(SENDER_DATA_PIN,LOW);
-    wait(1);
-    return;
-  }
-  case '1':{ 
-    digitalWrite(SENDER_DATA_PIN,HIGH);
-    wait(1);
-    digitalWrite(SENDER_DATA_PIN,LOW);
-    wait(3);
-    digitalWrite(SENDER_DATA_PIN,HIGH);
-    wait(1);
-    digitalWrite(SENDER_DATA_PIN,LOW);
-    wait(3);
-    return;
-  }
-  case 'x':{
-    digitalWrite(SENDER_DATA_PIN,HIGH);
-    wait(1);
-    digitalWrite(SENDER_DATA_PIN,LOW);
-    wait(31);
-  }
+    case '0':{
+      digitalWrite(SENDER_DATA_PIN,HIGH);
+      wait(1); 
+      digitalWrite(SENDER_DATA_PIN,LOW);
+      wait(1);
+      digitalWrite(SENDER_DATA_PIN,HIGH);
+      wait(3);
+      digitalWrite(SENDER_DATA_PIN,LOW);
+      wait(1);
+      return;
+    }
+    case '1':{ 
+      digitalWrite(SENDER_DATA_PIN,HIGH);
+      wait(1);
+      digitalWrite(SENDER_DATA_PIN,LOW);
+      wait(3);
+      digitalWrite(SENDER_DATA_PIN,HIGH);
+      wait(1);
+      digitalWrite(SENDER_DATA_PIN,LOW);
+      wait(3);
+      return;
+    }
+    case 'p':{
+      digitalWrite(SENDER_DATA_PIN,HIGH);
+      wait(1);
+      digitalWrite(SENDER_DATA_PIN,LOW);
+      wait(31);
+    }
+    case 'x':{
+      digitalWrite(SENDER_DATA_PIN,HIGH);
+      wait(1);
+      digitalWrite(SENDER_DATA_PIN,LOW);
+      wait(31);
+    }
   }
 }
  
