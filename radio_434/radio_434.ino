@@ -1,6 +1,8 @@
 
 #define SENDER_DATA_PIN A0
 
+#define DEBUG
+
 // 10101     00101100  11
 // preamble  payload   sync
 
@@ -34,7 +36,9 @@ void serialEvent() {
 }
 
 void convert(char binaryrep[], char payload) {
-  Serial.println(payload, BIN);
+  #ifdef DEBUG
+    Serial.println(payload, BIN);
+  #endif
   
   int paritybit = 0;
   
@@ -64,43 +68,50 @@ void sendMessage(char payload) {
 }
  
 void sendBit(char i) {
-  Serial.println(i);
-  //return;
+  #ifdef DEBUG
+    Serial.println(i);
+  #endif
   
   switch(i){
     case '0':{
       digitalWrite(SENDER_DATA_PIN,HIGH);
-      wait(1); 
+      wait(2); 
       digitalWrite(SENDER_DATA_PIN,LOW);
-      wait(1);
-      digitalWrite(SENDER_DATA_PIN,HIGH);
       wait(3);
-      digitalWrite(SENDER_DATA_PIN,LOW);
-      wait(1);
       return;
     }
     case '1':{ 
       digitalWrite(SENDER_DATA_PIN,HIGH);
-      wait(1);
+      wait(4); 
       digitalWrite(SENDER_DATA_PIN,LOW);
-      wait(3);
-      digitalWrite(SENDER_DATA_PIN,HIGH);
       wait(1);
-      digitalWrite(SENDER_DATA_PIN,LOW);
-      wait(3);
       return;
     }
     case 'p':{
       digitalWrite(SENDER_DATA_PIN,HIGH);
       wait(1);
       digitalWrite(SENDER_DATA_PIN,LOW);
-      wait(31);
+      wait(1);
+      digitalWrite(SENDER_DATA_PIN,HIGH);
+      wait(3);
+      digitalWrite(SENDER_DATA_PIN,LOW);
+      wait(1);
+      digitalWrite(SENDER_DATA_PIN,HIGH);
+      wait(1);
+      digitalWrite(SENDER_DATA_PIN,LOW);
+      wait(1);
+      return;
     }
     case 'x':{
       digitalWrite(SENDER_DATA_PIN,HIGH);
       wait(1);
       digitalWrite(SENDER_DATA_PIN,LOW);
-      wait(31);
+      wait(1);
+      digitalWrite(SENDER_DATA_PIN,HIGH);
+      wait(1);
+      digitalWrite(SENDER_DATA_PIN,LOW);
+      wait(1);
+      return;
     }
   }
 }
