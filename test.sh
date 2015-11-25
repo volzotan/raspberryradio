@@ -1,0 +1,1 @@
+rtl_fm -f 433.995M -g 35 -s 44.1k -M am | python test.py
