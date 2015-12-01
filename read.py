@@ -4,7 +4,6 @@ import struct
 class Reader(object):
 
 	fd = open("testdata_new_44kHz.dat")
-	fd = sys.stdin
 	preamble = False
 	pointer = 0
 	liste = [1,1,3,1,1,1]
@@ -97,25 +96,44 @@ class Reader(object):
 			if hill == 4 and valley == 1:
 				return 1
 			else:
-				return -1	
+				return -1
+	
+	def check(self, checkSum, counter):
+		if counter%2 == 0:
+			if checkSum == 0:
+				return True
+			else:
+				return False
+		else:
+			if checkSum == 1:
+				return True
+			else:
+				return False	
 
 if __name__ == "__main__":
 	reader = Reader()
-	array = [None] * 8
-	exponent = 0
-	num = 0
 	
 	try:
 		while True:
 			if reader.checkPreamble():
-				for i in range (0, len(array)):
+				array = [None] * 8
+				exponent = 0
+				num = 0
+				counter = 0
+	
+				for i in range (0, len(array)+1):
 					temp = reader.read_signal()
 					hill = reader.translate(temp[0])
 					valley = reader.translate(temp[1])
-					if reader.getBytes(hill, valley) != -1:
-						array[i] = reader.getBytes(hill,valley)
+					if i == len(array):
+						checkSum = reader.getBytes(hill,valley)
 					else:
-						print("Sorry, can't read your signal :(")
+						if reader.getBytes(hill, valley) != -1:
+							array[i] = reader.getBytes(hill,valley)
+							if array[i] == 1:
+								counter = counter + 1
+						else:
+							print("Sorry, can't read your signal :(")
 				for elem in array:
 					#print array
 					#print((num, elem, exponent))
@@ -123,7 +141,10 @@ if __name__ == "__main__":
 					#print(num),
 					exponent = exponent +1
 				sys.stdout.write(str(unichr(num)))
-				num = 0
-				exponent = 0
+				
+				if not reader.check(checkSum, counter):
+					continue
+
 	except Exception as e:
+		print e
 		pass
