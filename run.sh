@@ -1,1 +1,1 @@
-rtl_fm -f 433.975M -g 35 -s 44.1k -M am | python stdinread.py
+rtl_fm -f 433.975M -g 35 -s 44.1k -M am | python read.py

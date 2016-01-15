@@ -3,9 +3,10 @@ import struct
 
 class Reader(object):
 
-	fd = open("testdata_new_44kHz.dat")
-	preamble = False
-	pointer = 0
+	#fd = open("testdata_new_44kHz.dat")
+    fd = sys.stdin
+    preamble = False
+    pointer = 0
 	liste = [1,1,3,1,1,1]
 	
 	

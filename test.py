@@ -1,5 +1,6 @@
 import sys
 import struct 
+import time
 
 from enum import Enum
 
@@ -179,6 +180,9 @@ def listen():
 
 
 if __name__ == "__main__":
+    time.sleep(2)
+    print("\n\n")
+
     try:
         while True:
             listen()
